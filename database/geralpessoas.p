@@ -10,7 +10,17 @@ def TEMP-TABLE ttentradaConsulta NO-UNDO serialize-name "dadosEntradaConsulta"  
     field cnpj  AS CHAR.
 
 def temp-table ttconsultaCnpj  NO-UNDO serialize-name "consultaCnpj"  /* JSON SAIDA */
-    field cnae                    as CHAR.
+    field cnae                    as CHAR
+    FIELD nome                    AS CHAR 
+    FIELD nomeFantasia            AS CHAR
+    FIELD codigoCidade            AS CHAR
+    FIELD codigoEstado            AS CHAR
+    FIELD cep                     AS CHAR
+    FIELD bairro                  AS CHAR
+    FIELD endereco                AS CHAR
+    FIELD numero                  AS CHAR
+    FIELD municipio               AS CHAR
+    FIELD pais                    AS CHAR.
     
 //CNAE CLASSE
 def TEMP-TABLE ttentradaCnae NO-UNDO serialize-name "dadosEntradaCnae"  /* JSON ENTRADA */
@@ -87,7 +97,10 @@ THEN DO:
             end.
             geralpessoas.cnae = ttconsultaCnpj.cnae.
             
-            
+        END.
+        IF geralpessoas.cnae = "" OR geralpessoas.cnae = ? AND
+           geralpessoas.caracTrib <> ?
+        THEN DO:
             CREATE ttentradaCnae.
             ttentradaCnae.cnaeID = int(SUBSTRING(geralpessoas.cnae, 1, 5)).
             RUN LOG("Cria ttentradaCnae: CNAE: " + string(ttentradaCnae.cnaeID)).
