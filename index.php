@@ -2,8 +2,13 @@
 include_once __DIR__ . "/../config.php";
 include_once "header.php";
 
-if(!isset($_SESSION['nomeAplicativo']) || isset($_SESSION['nomeAplicativo']) && $_SESSION['nomeAplicativo'] !== 'Cadastros'){
-    $_SESSION['nomeAplicativo'] = 'Cadastros';
+if (
+    !isset($_SESSION['nomeAplicativo']) || 
+    $_SESSION['nomeAplicativo'] !== 'Admin' || 
+    !isset($_SESSION['nivelMenu']) || 
+    $_SESSION['nivelMenu'] === null
+) {
+    $_SESSION['nomeAplicativo'] = 'Admin';
     include_once ROOT . "/sistema/database/loginAplicativo.php";
 
     $nivelMenuLogin = buscaLoginAplicativo($_SESSION['idLogin'], $_SESSION['nomeAplicativo']);
