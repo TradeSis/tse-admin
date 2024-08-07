@@ -18,7 +18,17 @@ def TEMP-TABLE ttentrada NO-UNDO serialize-name "dadosEntrada"  /* JSON ENTRADA 
     field cnpj  AS CHAR.
 
 def temp-table ttconsultaCnpj  NO-UNDO serialize-name "consultaCnpj"  /* JSON SAIDA */
-    field cnae                    as CHAR.
+    field cnae                    as CHAR
+    FIELD nome                    AS CHAR 
+    FIELD nomeFantasia            AS CHAR
+    FIELD codigoCidade            AS CHAR
+    FIELD codigoEstado            AS CHAR
+    FIELD cep                     AS CHAR
+    FIELD bairro                  AS CHAR
+    FIELD endereco                AS CHAR
+    FIELD numero                  AS CHAR
+    FIELD municipio               AS CHAR
+    FIELD pais                    AS CHAR.
     
 def temp-table ttsaida  no-undo serialize-name "conteudoSaida"  /* JSON SAIDA CASO ERRO */
     field tstatus        as int serialize-name "status"

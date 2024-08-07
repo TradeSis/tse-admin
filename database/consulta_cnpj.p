@@ -26,6 +26,9 @@ DEF VAR lcJsonResponse   AS LONGCHAR NO-UNDO.
   
 DEFINE VARIABLE joCNPJ         AS JsonObject NO-UNDO.
 DEFINE VARIABLE joCNAE         AS JsonObject NO-UNDO.
+DEFINE VARIABLE joEndereco     AS JsonObject NO-UNDO.
+DEFINE VARIABLE joMunicipio    AS JsonObject NO-UNDO.
+DEFINE VARIABLE joPais    AS JsonObject NO-UNDO.
 RUN LOG("INICIO DATABASE CONSULTA_CNPJ").
 
 def TEMP-TABLE ttentrada NO-UNDO serialize-name "dadosEntrada"  /* JSON ENTRADA */
@@ -33,7 +36,17 @@ def TEMP-TABLE ttentrada NO-UNDO serialize-name "dadosEntrada"  /* JSON ENTRADA 
     field cnpj  AS CHAR.
 
 def temp-table ttconsultaCnpj  NO-UNDO serialize-name "consultaCnpj"  /* JSON SAIDA */
-    field cnae                    as CHAR.
+    field cnae                    as CHAR
+    FIELD nome                    AS CHAR 
+    FIELD nomeFantasia            AS CHAR
+    FIELD codigoCidade            AS CHAR
+    FIELD codigoEstado            AS CHAR
+    FIELD cep                     AS CHAR
+    FIELD bairro                  AS CHAR
+    FIELD endereco                AS CHAR
+    FIELD numero                  AS CHAR
+    FIELD municipio               AS CHAR
+    FIELD pais                    AS CHAR.
     
 def temp-table ttsaida  no-undo serialize-name "conteudoSaida"  /* JSON SAIDA CASO ERRO */
     field tstatus        as int serialize-name "status"
@@ -85,13 +98,29 @@ netResponse = netClient:EXECUTE(netRequest).
 if type-of(netResponse:Entity, JsonObject) then do:
     joResponse = CAST(netResponse:Entity, JsonObject).
     joResponse:Write(lcJsonResponse).
-    //RUN LOG("RETORNO CNPJ " + STRING(lcJsonResponse)).
+    RUN LOG("RETORNO CNPJ " + STRING(lcJsonResponse)).
     
     joCNPJ = joResponse.
     joCNAE = joCNPJ:GetJsonObject("cnaePrincipal").
+    joEndereco = joCNPJ:GetJsonObject("endereco").
+    joMunicipio = joEndereco:GetJsonObject("municipio").
+    joPais = joEndereco:GetJsonObject("pais").
 
    CREATE ttconsultaCnpj.
    ttconsultaCnpj.cnae = joCNAE:GetCharacter("codigo").
+   ttconsultaCnpj.nome = joCNPJ:GetCharacter("nomeEmpresarial").
+   ttconsultaCnpj.nomeFantasia = joCNPJ:GetCharacter("nomeFantasia").
+   
+   ttconsultaCnpj.codigoCidade = joMunicipio:GetCharacter("codigo").
+   ttconsultaCnpj.codigoEstado = joEndereco:GetCharacter("uf").
+   
+   ttconsultaCnpj.cep = joEndereco:GetCharacter("cep").
+   ttconsultaCnpj.bairro = joEndereco:GetCharacter("bairro").
+   ttconsultaCnpj.endereco = joEndereco:GetCharacter("tipoLogradouro") + " " + joEndereco:GetCharacter("logradouro").
+   ttconsultaCnpj.numero = joEndereco:GetCharacter("numero").
+   
+   ttconsultaCnpj.municipio = joMunicipio:GetCharacter("descricao").
+   ttconsultaCnpj.pais = joPais:GetCharacter("descricao").
    RUN LOG("Criou ttconsultaCnpj: " + ttconsultaCnpj.cnae).
 END.
 
